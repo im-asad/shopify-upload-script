@@ -13,6 +13,7 @@
     "axios": "^0.20.0",
     "imagemin": "^7.0.1",
     "imagemin-mozjpeg": "^9.0.0",
+    "log-to-file": "^2.0.2",
     "read-excel-file": "^4.0.7",
     "shopify-api-node": "^3.4.4",
     "xlsx": "^0.16.8"

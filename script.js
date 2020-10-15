@@ -1,3 +1,4 @@
+const log = require('log-to-file');
 const read = require('read-excel-file/node');
 const axios = require('axios');
 const fs = require('fs');
@@ -16,12 +17,24 @@ const BUCKET_NAME = "liporiashopify-product-images";
 const IAM_USER_KEY = 'AKIA34UZGOQY6YGHRQJZ';
 const IAM_USER_SECRET = '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';
 
+const success_statuses = [200, 201, 202, 203, 204, 205, 206, 207, 208, 209]
+
 const update_product = async (product_id, product) => {
     const response = await axios.put(`${url}/products/${product_id}.json`, { product });
+    if (!success_statuses.includes(response.status)) {
+        log(`${response.statusText} - ${product.title}`, 'update-error.log')
+    } else {
+        log(`${response.statusText} - ${product.title}`, 'update-success.log')
+    }
 };
 
 const create_product = async (product) => {
     const response = await axios.post(`${url}/products.json`, { product });
+    if (!success_statuses.includes(response.status)) {
+        log(`${response.statusText} - ${product.title}`, 'create-error.log')
+    } else {
+        log(`${response.statusText} - ${product.title}`, 'create-success.log')
+    }
 };
 
 read('bulk_update.xlsx').then(async (records) => {
@@ -40,7 +53,7 @@ read('bulk_update.xlsx').then(async (records) => {
     console.log("Number of total Shopify products retrieved: ", existing_products.length);
     console.log("Running script...");
     const products = [];
-    const rows = records;
+    const rows = records.slice(0, 2);
     for (let i = 1; i < rows.length; i++) {
         const product = {};
         product.handle = rows[i][0];
@@ -93,10 +106,13 @@ read('bulk_update.xlsx').then(async (records) => {
             if (product.images.length === 0) {
                 delete product.images;
             }
+            console.log("Updating product: ", product.title);
             await update_product(product_id, product);
         } else {
+            console.log("Creating product: ", product.title);
             await create_product(product);
         }
+        console.log(`Done: ${i}/${rows.length - 1}`);
 
         products.push(product);
     }

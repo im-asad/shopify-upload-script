@@ -1,2 +1,6 @@
 /node_modules
 package-lock.json
+update-error.log
+update-success.log
+create-error.log
+create-success.log
